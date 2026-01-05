@@ -13,46 +13,111 @@ datasource db {
   provider = "postgresql"
 }
 
-model Post{
-  id Int @id @default(autoincrement())
-  title String @unique
-  content String
-  thumbnail String?
+model Post {
+  id         Int        @id @default(autoincrement())
+  title      String     @unique
+  content    String
+  thumbnail  String?
   isFeatured Boolean
-  status PostStatus @default(PUBLISHED)
-  tags String[]
-  views Int @default(0)
-  authorId Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  comments Comment[]
+  status     PostStatus @default(PUBLISHED)
+  tags       String[]
+  views      Int        @default(0)
+  authorId   Int
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  comments   Comment[]
+
   @@index([authorId])
   @@map("posts")
 }
 
-model Comment{
-  id Int @id @default(autoincrement())
-  content String 
-  authorId Int 
-  postId Int
-  post Post @relation(fields: [postId], references: [id])
-  status CommentStatus @default(APPROVED)
-  parentId Int?
-  parent Comment? @relation("CommentReplies", fields: [parentId], references: [id])
-  replies Comment[] @relation("CommentReplies")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Comment {
+  id        Int           @id @default(autoincrement())
+  content   String
+  authorId  Int
+  postId    Int
+  post      Post          @relation(fields: [postId], references: [id])
+  status    CommentStatus @default(APPROVED)
+  parentId  Int?
+  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[]     @relation("CommentReplies")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
   @@index([postId])
   @@map("comments")
 }
 
-enum CommentStatus{
+enum CommentStatus {
   APPROVED
   REJECTED
 }
 
-enum PostStatus{
+enum PostStatus {
   DRAFT
   PUBLISHED
   ARCHIVE
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
