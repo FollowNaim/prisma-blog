@@ -82,7 +82,19 @@ const getAllPosts = async ({
       [sortBy]: sortOrder,
     },
   });
-  return result;
+
+  const count = await prisma.post.count({
+    where: {
+      AND: andConditions,
+    },
+  });
+  return {
+    data: result,
+    total: count,
+    currentPage: page,
+    currentLimit: limit,
+    totalPages: Math.ceil(count / limit),
+  };
 };
 
 const createPost = async (
