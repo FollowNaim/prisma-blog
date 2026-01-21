@@ -22,7 +22,7 @@ model Post {
   status     PostStatus @default(PUBLISHED)
   tags       String[]
   views      Int        @default(0)
-  authorId   Int
+  authorId   String
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   comments   Comment[]
@@ -64,6 +64,8 @@ model User {
   name          String
   email         String
   emailVerified Boolean   @default(false)
+  role          String?
+  phone         Int?
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
