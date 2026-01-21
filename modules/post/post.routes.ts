@@ -5,10 +5,12 @@ const router = express.Router();
 
 router.get("/", postControllers.getAllPosts);
 
+router.get("/:id", postControllers.getPostById);
+
 router.post(
   "/create",
   authMiddleware(UserRole.admin),
-  postControllers.createPost
+  postControllers.createPost,
 );
 
 const postRouter = router;

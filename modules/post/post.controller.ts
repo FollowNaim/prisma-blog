@@ -39,6 +39,24 @@ const getAllPosts = async (req: Request, res: Response) => {
   }
 };
 
+const getPostById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      throw new Error("post id is required");
+    }
+    const result = await postServices.getPostById(Number(id));
+    res.status(200).json({
+      success: "true",
+      message: "Post fetched successfully",
+      result,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ success: false, message: "post fetched failed" });
+  }
+};
+
 const createPost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
@@ -53,6 +71,6 @@ const createPost = async (req: Request, res: Response) => {
   }
 };
 
-const postControllers = { createPost, getAllPosts };
+const postControllers = { createPost, getAllPosts, getPostById };
 
 export default postControllers;
