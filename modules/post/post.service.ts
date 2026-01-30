@@ -74,13 +74,13 @@ const getAllPosts = async ({
   const result = await prisma.post.findMany({
     take: limit,
     skip: skip,
-
     where: {
       AND: andConditions,
     },
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: { _count: { select: { comments: true } } },
   });
 
   const count = await prisma.post.count({
@@ -113,6 +113,22 @@ const getPostById = async (id: number) => {
       const postData = await prisma.post.findUnique({
         where: {
           id,
+        },
+        include: {
+          comments: {
+            where: {
+              parentId: null,
+            },
+            orderBy: { createdAt: "desc" },
+            include: {
+              replies: {
+                include: {
+                  replies: true,
+                },
+              },
+            },
+          },
+          _count: { select: { comments: true } },
         },
       });
       return postData;

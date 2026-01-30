@@ -34,12 +34,12 @@ model Post {
 model Comment {
   id        Int           @id @default(autoincrement())
   content   String
-  authorId  Int
+  authorId  String
   postId    Int
   post      Post          @relation(fields: [postId], references: [id])
   status    CommentStatus @default(APPROVED)
   parentId  Int?
-  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies   Comment[]     @relation("CommentReplies")
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
